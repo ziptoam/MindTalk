@@ -1,3 +1,5 @@
+import os
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 import gradio as gr
 from dataclasses import asdict
 from lmdeploy import turbomind as tm
