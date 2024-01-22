@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings('ignore')
 from openxlab.model import download
 
-download(model_repo='seifer08ms/seifer_assistant_model_4bit', 
+download(model_repo='ziptoam/MindTalk', 
         output='hf_merge')
 
 model_path = "hf_merge"
