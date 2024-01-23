@@ -12,7 +12,7 @@ from openxlab.model import download
 
 download(model_repo='ziptoam/MindTalk', 
         output='hf_merge')
-os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/hf_merge --model-format awq --group-size 128")
+os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/hf_merge --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
 model_path = "/home/xlab-app-center/workspace"
 user_prompt = ":{user}\n"
 robot_prompt = ":{robot}<eoa>\n"
