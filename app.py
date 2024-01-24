@@ -73,8 +73,9 @@ with block as demo:
         db_wo_his_btn.click(chat_model.get_response, inputs=[msg, chatbot], outputs=[msg, chatbot])
 
     gr.Markdown("""Reminder:<br>
-    1. Initializing the database may take some time, please be patient.
-    2. If any exceptions occur during use, they will be displayed in the text input box. Please do not panic.<br>
+    1. 心理互助问答，非心理咨询，仅为心理知识分享；
+    2. 如果加载比较慢，可以多等一等；
+    2. 数据来源于壹心理清洗，壹心理已过滤任何发布者信息部分，仅使用文本.<br>
     """)
 
 gr.close_all()
