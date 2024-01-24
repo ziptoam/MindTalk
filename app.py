@@ -53,8 +53,8 @@ with block as demo:
     with gr.Row(equal_height=True):   
         with gr.Column(scale=15):
             # Display page title
-            gr.Markdown("""<h1><center>InternLM Seifer Assistant</center></h1>
-                <center>书生浦语-seifer小助手</center>
+            gr.Markdown("""<h1><center>SmartCure_MindTalk</center></h1>
+                <center>智愈心语-开解唠嗑员</center>
                 """)
     with gr.Row():
         with gr.Column(scale=4):
