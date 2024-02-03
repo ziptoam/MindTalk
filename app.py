@@ -50,7 +50,8 @@ class OurLLM(CustomLLM):
         # response = pipeline(prompt, max_new_tokens=num_output)[0]["generated_text"]
         # 在这个函数里将prompt输入给model
         generator = tm_model.create_instance()
-        # print(prompt)
+        print("prompt生成：")
+        print(prompt)
 
         input_ids = tm_model.tokenizer.encode(prompt)
         
@@ -59,9 +60,9 @@ class OurLLM(CustomLLM):
 
         response = tm_model.tokenizer.decode(res.tolist())
         
-        
+        print("返回结果生成：")
         # only return newly generated tokens
-        # print(response)
+        print(response)
         
         return CompletionResponse(text=response)
     
