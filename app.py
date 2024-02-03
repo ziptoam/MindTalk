@@ -7,6 +7,10 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
 import warnings
+
+from typing import Optional, List, Mapping, Any
+
+
 from llama_index import (
      VectorStoreIndex,
      ServiceContext, 
@@ -67,10 +71,15 @@ class OurLLM(CustomLLM):
 
 llm = OurLLM()
 
+
+# set context window size
+context_window = 2048
+# set number of output tokens
+num_output = 500
+
 service_context = ServiceContext.from_defaults(
     llm=llm, 
     embed_model="local",
-
     context_window=context_window, 
     num_output=num_output
 )
