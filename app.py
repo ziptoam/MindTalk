@@ -32,6 +32,11 @@ download(model_repo='OpenLMLab/InternLM-chat-7b',
 
 model_path = "/home/xlab-app-center/internlm-chat-7b"
 
+# set context window size
+context_window = 2048
+# set number of output tokens
+num_output = 250
+
 print("正在从本地加载模型...")
 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
