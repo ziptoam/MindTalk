@@ -30,13 +30,17 @@ warnings.filterwarnings('ignore')
 from openxlab.model import download
 
 download(model_repo='OpenLMLab/InternLM-chat-7b', 
-        output='internlm-7b-chat')
-os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-7b-chat --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
-model_path = "/home/xlab-app-center/workspace"
+        output='internlm-chat-7b')
+# os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-7b-chat --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
+# model_path = "/home/xlab-app-center/workspace"
 
-tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
-generator = tm_model.create_instance()
-
+# tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
+# generator = tm_model.create_instance()
+print("正在从本地加载模型...")
+tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
+model = self.model.eval()
+print("完成本地模型的加载")
 
 class OurLLM(CustomLLM):
     # 基于本地 InternLM 自定义 LLM 类
@@ -55,12 +59,13 @@ class OurLLM(CustomLLM):
         print("prompt生成：")
         print(prompt)
 
-        input_ids = tm_model.tokenizer.encode(prompt)
+        # input_ids = tm_model.tokenizer.encode(prompt)
         
-        for outputs in generator.stream_infer(session_id=0, input_ids=[input_ids]):
-            res, tokens = outputs[0]
+        # for outputs in generator.stream_infer(session_id=0, input_ids=[input_ids]):
+        #     res, tokens = outputs[0]
 
-        response = tm_model.tokenizer.decode(res.tolist())
+        # response = tm_model.tokenizer.decode(res.tolist())
+        response, history = self.model.chat(tokenizer, prompt , history=messages)
         
         print("返回结果生成：")
         # only return newly generated tokens
