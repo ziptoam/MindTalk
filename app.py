@@ -64,7 +64,7 @@ class OurLLM(CustomLLM):
         
         # for outputs in generator.stream_infer(session_id=0, input_ids=[input_ids]):
         #     res, tokens = outputs[0]
-
+        message = ""
         # response = tm_model.tokenizer.decode(res.tolist())
         response, history = model.chat(tokenizer, prompt , history=messages)
         
