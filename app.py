@@ -66,7 +66,7 @@ class OurLLM(CustomLLM):
         #     res, tokens = outputs[0]
 
         # response = tm_model.tokenizer.decode(res.tolist())
-        response, history = self.model.chat(tokenizer, prompt , history=messages)
+        response, history = model.chat(tokenizer, prompt , history=messages)
         
         print("返回结果生成：")
         # only return newly generated tokens
