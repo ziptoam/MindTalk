@@ -36,6 +36,7 @@ download(model_repo='OpenLMLab/InternLM-chat-7b',
 
 # tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
 # generator = tm_model.create_instance()
+model_path = "/home/xlab-app-center/internlm-chat-7b"
 print("正在从本地加载模型...")
 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
