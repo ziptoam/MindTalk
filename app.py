@@ -40,7 +40,7 @@ model_path = "/home/xlab-app-center/internlm-chat-7b"
 print("正在从本地加载模型...")
 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
-model = self.model.eval()
+model = model.eval()
 print("完成本地模型的加载")
 
 class OurLLM(CustomLLM):
