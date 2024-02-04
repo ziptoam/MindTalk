@@ -31,7 +31,7 @@ from openxlab.model import download
 
 download(model_repo='OpenLMLab/InternLM-chat-7b', 
         output='internlm-chat-7b')
-# os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-7b-chat --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
+# os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-chat-7b --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
 # model_path = "/home/xlab-app-center/workspace"
 
 # tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
