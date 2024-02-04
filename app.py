@@ -24,19 +24,14 @@ from llama_index.prompts import PromptTemplate
 from llama_index.llms import CustomLLM, CompletionResponse, LLMMetadata
 
 current_path = os.path.abspath(__file__)
-print("path:\n")
-print(current_path)
 warnings.filterwarnings('ignore')
 from openxlab.model import download
 
 download(model_repo='OpenLMLab/InternLM-chat-7b', 
         output='internlm-chat-7b')
-# os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-chat-7b --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
-# model_path = "/home/xlab-app-center/workspace"
 
-# tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
-# generator = tm_model.create_instance()
 model_path = "/home/xlab-app-center/internlm-chat-7b"
+
 print("正在从本地加载模型...")
 tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
@@ -44,51 +39,38 @@ model = model.eval()
 print("完成本地模型的加载")
 
 class OurLLM(CustomLLM):
-    # 基于本地 InternLM 自定义 LLM 类
+     # 基于本地 InternLM 自定义 LLM 类
 
-    @property
-    def metadata(self) -> LLMMetadata:
-        """Get LLM metadata."""
-        return LLMMetadata(
-            context_window=context_window, num_output=num_output
-        )
+     @property
+     def metadata(self) -> LLMMetadata:
+          """Get LLM metadata."""
+          return LLMMetadata(
+               context_window=context_window, num_output=num_output
+          )
 
-    def complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
-        # response = pipeline(prompt, max_new_tokens=num_output)[0]["generated_text"]
-        # 在这个函数里将prompt输入给model
-        
-        print("prompt生成：")
-        print(prompt)
+     def complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
+          # response = pipeline(prompt, max_new_tokens=num_output)[0]["generated_text"]
+          # 在这个函数里将prompt输入给model
+          system_prompt = ""
+          print(prompt)
+          messages = [(system_prompt, '')]
+          response, history = model.chat(tokenizer, prompt, history=messages)
+          
+          # only return newly generated tokens
+          print(response)
+          
+          return CompletionResponse(text=response)
+     
+     def stream_complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
+          raise NotImplementedError()
 
-        # input_ids = tm_model.tokenizer.encode(prompt)
-        
-        # for outputs in generator.stream_infer(session_id=0, input_ids=[input_ids]):
-        #     res, tokens = outputs[0]
-        message = ""
-        # response = tm_model.tokenizer.decode(res.tolist())
-        response, history = model.chat(tokenizer, prompt , history=messages)
-        
-        print("返回结果生成：")
-        # only return newly generated tokens
-        print(response)
-        
-        return CompletionResponse(text=response)
-    
-    def stream_complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
-        raise NotImplementedError()
-
-
+# define our LLM
 llm = OurLLM()
-
-
-# set context window size
-context_window = 2048
-# set number of output tokens
-num_output = 500
 
 service_context = ServiceContext.from_defaults(
     llm=llm, 
     embed_model="local",
+
     context_window=context_window, 
     num_output=num_output
 )
@@ -127,7 +109,7 @@ qa_prompt_tmpl_str = (
      "{context_str}\n"
      "---------------------\n"
      "基于上面的案例和你自己学到的相关的心理知识,"
-     "用专业心理治疗师的口吻，回答下面这个问题.\n"
+     "用专业心理治疗师的口吻，回答下面这个问题，同时这个问题里会包含一些与用户心理问题相关的聊天记录，你要利用已有的信息\n"
      "问题: {query_str}\n"
      "请你根据这个心理问题给出回答: "
 )
@@ -138,6 +120,7 @@ refine_prompt_tmpl_str = (
      "回答具有如下要求：\n"
      "- 必须要回答中文，不能说英文.\n"
      "- 不要进行重复回答.\n"
+     "- 这个问题里会包含一些与用户心理问题相关的聊天记录，你要利用已有的信息\n"
      "这个心理问题是: {query_str}\n"
      "之前已经有一个心理治疗师已经给出了一些见解: {existing_answer}\n"
      "现在你需要结合上一个心理治疗师的见解，并结合下面的一些条件给出你的合理回答.\n"
@@ -154,25 +137,41 @@ refine_prompt_tmpl = PromptTemplate(refine_prompt_tmpl_str)
 
 query_engine = index.as_query_engine(similarity_top_k=2, text_qa_template=qa_prompt_tmpl, refine_template=refine_prompt_tmpl)
 
+# while 1 :
+#      input_question = input("请输入输入问题: ")
+#      response = query_engine.query(input_question)
+#      print(response)
+
+def get_response_from_llamaIndex(question) : 
+     response = str(query_engine.query(question))
+     print(response)
+     return response
 
 
-class ChatModel:
+
+class Model_center():
+    """
+    存储问答 Chain 的对象 
+    """
     def __init__(self):
-        print("chatbot初始化")
+        print("Model_center启动")
 
-    def get_response(self, question: str, chat_history: list = []):
-        if question is None or len(question) < 1:
+    def qa_chain_self_answer(self, question: str, chat_history: list = []):
+        """
+        调用不带历史记录的问答链进行回答
+        """
+        if question == None or len(question) < 1:
             return "", chat_history
         try:
-            question = question.replace(" ", '')
-            response = query_engine.query(question)
-            chat_history.append((question, response))
+            
+            chat_history.append(
+                (question, get_response_from_llamaIndex(question)))
             return "", chat_history
         except Exception as e:
             return e, chat_history
 
 # Instantiate chat model object
-chat_model = ChatModel()
+chat_model = Model_center()
 
 # Create a Gradio interface
 block = gr.Blocks()
@@ -197,7 +196,7 @@ with block as demo:
                 # Create a clear button to clear chatbot content
                 clear = gr.ClearButton(components=[chatbot], value="Clear console")
     
-        db_wo_his_btn.click(chat_model.get_response, inputs=[msg, chatbot], outputs=[msg, chatbot])
+        db_wo_his_btn.click(chat_model.qa_chain_self_answer, inputs=[msg, chatbot], outputs=[msg, chatbot])
 
     gr.Markdown("""Reminder:<br>
     1. 心理互助问答，非心理咨询，仅为心理知识分享；
@@ -209,3 +208,9 @@ gr.close_all()
 
 # Launch the interface
 demo.launch()
+
+
+
+
+# 前不久和男朋友分手了，导致现在心情很抑郁怎么办？
+# link from https://stackoverflow.com/questions/76625768/importerror-cannot-import-name-customllm-from-llama-index-llms
