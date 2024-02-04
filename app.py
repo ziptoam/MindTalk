@@ -23,7 +23,9 @@ from llama_index.embeddings import LangchainEmbedding
 from llama_index.prompts import PromptTemplate
 from llama_index.llms import CustomLLM, CompletionResponse, LLMMetadata
 
-
+current_path = os.path.abspath(__file__)
+print("path:\n")
+print(current_path)
 warnings.filterwarnings('ignore')
 from openxlab.model import download
 
