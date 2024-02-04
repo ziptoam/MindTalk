@@ -27,7 +27,7 @@ from llama_index.llms import CustomLLM, CompletionResponse, LLMMetadata
 warnings.filterwarnings('ignore')
 from openxlab.model import download
 
-tm_model = tm.TurboMind.from_pretrained('internlm/internlm-chat-7b', model_name='internlm-chat-7b')
+tm_model = tm.TurboMind.from_pretrained('OpenLMLab/InternLM-chat-7b', model_name='internlm-chat-7b')
 
 class OurLLM(CustomLLM):
     # 基于本地 InternLM 自定义 LLM 类
