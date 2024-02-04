@@ -33,6 +33,8 @@ os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/internlm-7b-
 model_path = "/home/xlab-app-center/workspace"
 
 tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b')
+generator = tm_model.create_instance()
+
 
 class OurLLM(CustomLLM):
     # 基于本地 InternLM 自定义 LLM 类
@@ -47,7 +49,7 @@ class OurLLM(CustomLLM):
     def complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
         # response = pipeline(prompt, max_new_tokens=num_output)[0]["generated_text"]
         # 在这个函数里将prompt输入给model
-        generator = tm_model.create_instance()
+        
         print("prompt生成：")
         print(prompt)
 
