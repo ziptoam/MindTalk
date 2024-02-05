@@ -39,9 +39,8 @@ context_window = 2048
 num_output = 250
 
 print("正在从本地加载模型...")
-tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True).to(torch.bfloat16).cuda()
-model = model.eval()
+tm_model = tm.TurboMind.from_pretrained(model_path, model_name='internlm-chat-7b'
+generator = self.tm_model.create_instance()
 print("完成本地模型的加载")
 
 class OurLLM(CustomLLM):
@@ -57,10 +56,13 @@ class OurLLM(CustomLLM):
      def complete(self, prompt: str, **kwargs: Any) -> CompletionResponse:
           # response = pipeline(prompt, max_new_tokens=num_output)[0]["generated_text"]
           # 在这个函数里将prompt输入给model
-          system_prompt = ""
           print(prompt)
-          messages = [(system_prompt, '')]
-          response, history = model.chat(tokenizer, prompt, history=messages)
+          input_ids = tm_model.tokenizer.encode(prompt)
+        
+          for outputs in generator.stream_infer(session_id=0, input_ids=[input_ids]):
+            res, tokens = outputs[0]
+
+          response = tm_model.tokenizer.decode(res.tolist())
           
           # only return newly generated tokens
           print(response)
@@ -143,17 +145,10 @@ refine_prompt_tmpl = PromptTemplate(refine_prompt_tmpl_str)
 
 query_engine = index.as_query_engine(similarity_top_k=2, text_qa_template=qa_prompt_tmpl, refine_template=refine_prompt_tmpl)
 
-# while 1 :
-#      input_question = input("请输入输入问题: ")
-#      response = query_engine.query(input_question)
-#      print(response)
-
 def get_response_from_llamaIndex(question) : 
      response = str(query_engine.query(question))
      print(response)
      return response
-
-
 
 class Model_center():
     """
@@ -218,5 +213,4 @@ demo.launch()
 
 
 
-# 前不久和男朋友分手了，导致现在心情很抑郁怎么办？
 # link from https://stackoverflow.com/questions/76625768/importerror-cannot-import-name-customllm-from-llama-index-llms
