@@ -27,10 +27,11 @@ current_path = os.path.abspath(__file__)
 warnings.filterwarnings('ignore')
 from openxlab.model import download
 
-download(model_repo='OpenLMLab/InternLM-chat-7b', 
-        output='internlm-chat-7b')
+download(model_repo='ziptoam/mindtalk4bit', 
+        output='hf_merge')
+os.system("lmdeploy convert  internlm-chat-7b /home/xlab-app-center/hf_merge --model-format awq --group-size 128 --dst_path /home/xlab-app-center/workspace")
 
-model_path = "/home/xlab-app-center/internlm-chat-7b"
+model_path = "/home/xlab-app-center/workspace"
 
 # set context window size
 context_window = 2048
